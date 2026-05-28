@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BeautyBarn — Shop a Look MVP</title>
+  <style>
+    :root {
+      --bb-rose: #d84f7a;
+      --bb-rose-dark: #a92f59;
+      --bb-blush: #fff3f6;
+      --bb-soft: #fff9f3;
+      --bb-cream: #fffaf0;
+      --bb-ink: #1f1f1f;
+      --bb-muted: #70656a;
+      --bb-line: #f2dfe6;
+      --bb-green: #577b59;
+      --bb-yellow: #ffe8a6;
+      --bb-card: #ffffff;
+      --shadow: 0 22px 60px rgba(168, 62, 98, 0.14);
+      --shadow-soft: 0 12px 32px rgba(32, 20, 25, 0.08);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --max: 1180px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255, 216, 227, 0.9), transparent 32%),
+        radial-gradient(circle at 95% 10%, rgba(255, 232, 166, 0.6), transparent 30%),
+        linear-gradient(180deg, #fffaf8 0%, #fff5f8 42%, #fffaf4 100%);
+      color: var(--bb-ink);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 250, 248, 0.88);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(216, 79, 122, 0.12);
+    }
+
+    .nav {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 185px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--bb-rose), #ff9bb8 55%, #ffe4a7);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      box-shadow: 0 8px 22px rgba(216, 79, 122, 0.3);
+      font-weight: 900;
+      letter-spacing: -0.06em;
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+    }
+
+    .brand-text span {
+      display: block;
+      font-size: 11px;
+      color: var(--bb-muted);
+      margin-top: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .nav-link {
+      border: 0;
+      background: transparent;
+      padding: 10px 12px;
+      border-radius: 999px;
+      color: #5b4e53;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      background: #fff;
+      color: var(--bb-rose-dark);
+      box-shadow: 0 8px 22px rgba(168, 62, 98, 0.1);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn,
+    .cart-pill {
+      border: 1px solid var(--bb-line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .icon-btn:hover,
+    .cart-pill:hover,
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(168, 62, 98, 0.16);
+    }
+
+    .cart-count {
+      min-width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: var(--bb-rose);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .page {
+      display: none;
+      animation: fadeUp 0.32s ease both;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .container {
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 34px 20px 80px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 28px;
+      align-items: center;
+      padding: 34px 0 22px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(216, 79, 122, 0.18);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.7);
+      color: var(--bb-rose-dark);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin: 18px 0 14px;
+      font-size: clamp(42px, 6vw, 76px);
+      line-height: 0.92;
+      letter-spacing: -0.065em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--bb-rose-dark), var(--bb-rose), #cb8a1f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-copy {
+      max-width: 650px;
+      color: #5d5054;
+      font-size: 18px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font-weight: 850;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--bb-rose), #ee7fa1);
+      color: #fff;
+      box-shadow: 0 16px 35px rgba(216, 79, 122, 0.28);
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--bb-rose-dark);
+      border: 1px solid var(--bb-line);
+    }
+
+    .btn-dark {
+      background: var(--bb-ink);
+      color: #fff;
+    }
+
+    .btn-soft {
+      background: var(--bb-blush);
+      color: var(--bb-rose-dark);
+      border: 1px solid var(--bb-line);
+    }
+
+    .hero-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(216, 79, 122, 0.12);
+      border-radius: 38px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 240px;
+      height: 240px;
+      background: rgba(255, 232, 166, 0.8);
+      border-radius: 50%;
+      filter: blur(30px);
+    }
+
+    .before-after-frame {
+      position: relative;
+      min-height: 520px;
+      border-radius: 30px;
+      overflow: hidden;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .skin-photo {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .skin-photo.before {
+      background:
+        linear-gradient(180deg, rgba(72, 45, 53, 0), rgba(72, 45, 53, 0.42)),
+        radial-gradient(circle at 50% 38%, #e9b9a3 0 12%, transparent 13%),
+        radial-gradient(circle at 48% 40%, #f1c5b4 0 26%, transparent 27%),
+        linear-gradient(145deg, #f4d1c6, #e8a88e 55%, #d28878);
+    }
+
+    .skin-photo.after {
+      background:
+        linear-gradient(180deg, rgba(72, 45, 53, 0), rgba(72, 45, 53, 0.3)),
+        radial-gradient(circle at 50% 38%, #f8d5c6 0 12%, transparent 13%),
+        radial-gradient(circle at 48% 40%, #ffd9c9 0 26%, transparent 27%),
+        linear-gradient(145deg, #ffe1d1, #f7bfa9 55%, #e99a8d);
+    }
+
+    .skin-photo::after {
+      content: "";
+      position: absolute;
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      top: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background:
+        radial-gradient(circle at 35% 42%, rgba(118, 72, 62, 0.85) 0 3px, transparent 4px),
+        radial-gradient(circle at 65% 42%, rgba(118, 72, 62, 0.85) 0 3px, transparent 4px),
+        radial-gradient(circle at 50% 62%, rgba(118, 72, 62, 0.8) 0 12px, transparent 13px);
+      opacity: 0.34;
+      filter: blur(0.2px);
+    }
+
+    .skin-photo.before::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 38% 44%, rgba(162, 72, 70, 0.32) 0 4px, transparent 5px),
+        radial-gradient(circle at 61% 48%, rgba(162, 72, 70, 0.26) 0 5px, transparent 6px),
+        radial-gradient(circle at 48% 59%, rgba(126, 73, 65, 0.18) 0 5px, transparent 6px),
+        radial-gradient(circle at 54% 37%, rgba(126, 73, 65, 0.18) 0 4px, transparent 5px);
+    }
+
+    .skin-photo.after::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 38% 42%, rgba(255, 255, 255, 0.42) 0 16px, transparent 17px),
+        radial-gradient(circle at 58% 52%, rgba(255, 255, 255, 0.32) 0 18px, transparent 19px);
+      mix-blend-mode: soft-light;
+    }
+
+    .photo-label {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(31, 31, 31, 0.52);
+      backdrop-filter: blur(12px);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .result-badge {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      right: 18px;
+      z-index: 4;
+      background: rgba(255, 255, 255, 0.84);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: 0 14px 34px rgba(72, 45, 53, 0.13);
+    }
+
+    .result-badge strong {
+      display: block;
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      margin-bottom: 5px;
+    }
+
+    .result-badge span {
+      color: var(--bb-muted);
+      font-size: 13px;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(216, 79, 122, 0.12);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 28px;
+      letter-spacing: -0.04em;
+      color: var(--bb-rose-dark);
+    }
+
+    .stat-card span {
+      display: block;
+      color: var(--bb-muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 20px;
+      margin: 44px 0 20px;
+    }
+
+    .section-kicker {
+      color: var(--bb-rose-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1;
+      letter-spacing: -0.055em;
+      margin: 0;
+    }
+
+    .section-copy {
+      color: var(--bb-muted);
+      line-height: 1.6;
+      max-width: 620px;
+      margin: 10px 0 0;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 3px 0 16px;
+      scrollbar-width: none;
+    }
+
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-chip {
+      flex: 0 0 auto;
+      border: 1px solid var(--bb-line);
+      background: rgba(255, 255, 255, 0.76);
+      color: #604f56;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 750;
+      transition: all 0.2s ease;
+    }
+
+    .filter-chip:hover,
+    .filter-chip.active {
+      background: var(--bb-rose);
+      color: #fff;
+      border-color: var(--bb-rose);
+      box-shadow: 0 10px 22px rgba(216, 79, 122, 0.23);
+    }
+
+    .look-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .look-card {
+      border: 1px solid rgba(216, 79, 122, 0.12);
+      background: rgba(255, 255, 255, 0.78);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.24s ease, box-shadow 0.24s ease;
+      padding: 0;
+    }
+
+    .look-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow);
+    }
+
+    .look-visual {
+      height: 270px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--bb-line);
+      position: relative;
+    }
+
+    .look-visual .skin-photo {
+      padding: 12px;
+    }
+
+    .look-visual .skin-photo::after {
+      top: 54px;
+      width: 64px;
+      height: 64px;
+    }
+
+    .look-visual .photo-label {
+      font-size: 10px;
+      padding: 6px 9px;
+    }
+
+    .hero-card,
+    .detail-photo-card {
+      --featured-look-image: url("Dullness to healthy glow.jpg");
+    }
+
+    .hero-card .skin-photo::before,
+    .hero-card .skin-photo::after,
+    .detail-photo-card .skin-photo::before,
+    .detail-photo-card .skin-photo::after {
+      display: none;
+    }
+
+    .hero-card .skin-photo.before,
+    .hero-card .skin-photo.after,
+    .detail-photo-card .skin-photo.before,
+    .detail-photo-card .skin-photo.after {
+      background-image:
+        linear-gradient(180deg, rgba(25, 19, 22, 0.06), rgba(25, 19, 22, 0.18)),
+        var(--featured-look-image);
+      background-repeat: no-repeat, no-repeat;
+      background-size: 100% 100%, 200% 100%;
+    }
+
+    .hero-card .skin-photo.before,
+    .detail-photo-card .skin-photo.before {
+      background-position: center, left center;
+    }
+
+    .hero-card .skin-photo.after,
+    .detail-photo-card .skin-photo.after {
+      background-position: center, right center;
+    }
+
+    .look-grid .look-card .skin-photo::before,
+    .look-grid .look-card .skin-photo::after {
+      display: none;
+    }
+
+    .look-grid .look-card .skin-photo.before,
+    .look-grid .look-card .skin-photo.after {
+      background-image:
+        linear-gradient(180deg, rgba(25, 19, 22, 0.06), rgba(25, 19, 22, 0.18)),
+        var(--look-card-image);
+      background-repeat: no-repeat, no-repeat;
+      background-size: 100% 100%, 200% 100%;
+    }
+
+    .look-grid .look-card .skin-photo.before {
+      background-position: center, left center;
+    }
+
+    .look-grid .look-card .skin-photo.after {
+      background-position: center, right center;
+    }
+
+    .look-grid .look-card[data-category="glow beginner"] {
+      --look-card-image: url("Dullness to healthy glow.jpg");
+    }
+
+    .look-grid .look-card[data-category="acne sensitive"] {
+      --look-card-image: url("Calm active acne without stripping skin.jpg");
+    }
+
+    .look-grid .look-card[data-category="barrier sensitive"] {
+      --look-card-image: url("Damaged barrier to calm hydrated skin.png");
+    }
+
+    .look-grid .look-card[data-category="pigmentation glow"] {
+      --look-card-image: url("Dark spots to visibly even tone.jpg");
+    }
+
+    .look-grid .look-card[data-category="beginner glow"] {
+      --look-card-image: url("First Korean skincare routine.png");
+    }
+
+    .look-grid .look-card[data-category="sensitive barrier"] {
+      --look-card-image: url("can you change and place the image others not change.jpg");
+    }
+
+    .look-content {
+      padding: 18px;
+    }
+
+    .tag-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bb-blush);
+      border: 1px solid var(--bb-line);
+      color: var(--bb-rose-dark);
+      padding: 6px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .tag.green {
+      background: #eff8ee;
+      color: var(--bb-green);
+      border-color: #dcefdc;
+    }
+
+    .tag.yellow {
+      background: #fff7d6;
+      color: #8a660d;
+      border-color: #ffedb4;
+    }
+
+    .look-card h3 {
+      font-size: 21px;
+      letter-spacing: -0.04em;
+      line-height: 1.08;
+      margin: 0 0 10px;
+    }
+
+    .look-card p {
+      color: var(--bb-muted);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .price-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 850;
+    }
+
+    .price-line span {
+      color: var(--bb-rose-dark);
+    }
+
+    .mini-btn {
+      border: 0;
+      background: var(--bb-ink);
+      color: #fff;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 12px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .sticky-panel {
+      position: sticky;
+      top: 92px;
+    }
+
+    .detail-photo-card,
+    .panel-card {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(216, 79, 122, 0.13);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .detail-photo-card .before-after-frame {
+      min-height: 520px;
+      border-radius: 0;
+    }
+
+    .panel-card {
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .detail-title {
+      font-size: clamp(34px, 5vw, 58px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      margin: 10px 0 12px;
+    }
+
+    .trust-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 20px 0;
+    }
+
+    .trust-item {
+      background: var(--bb-soft);
+      border: 1px solid rgba(216, 79, 122, 0.11);
+      border-radius: 18px;
+      padding: 13px;
+    }
+
+    .trust-item strong {
+      display: block;
+      font-size: 18px;
+      color: var(--bb-rose-dark);
+    }
+
+    .trust-item span {
+      color: var(--bb-muted);
+      font-size: 12px;
+    }
+
+    .routine-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--bb-line);
+      background: var(--bb-blush);
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    .routine-tab {
+      border: 0;
+      background: transparent;
+      border-radius: 999px;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: 850;
+      color: var(--bb-muted);
+    }
+
+    .routine-tab.active {
+      background: #fff;
+      color: var(--bb-rose-dark);
+      box-shadow: 0 8px 18px rgba(168, 62, 98, 0.1);
+    }
+
+    .routine-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .routine-step {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid rgba(216, 79, 122, 0.12);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .step-no {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--bb-blush);
+      color: var(--bb-rose-dark);
+      font-weight: 950;
+    }
+
+    .step-copy strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .step-copy span {
+      display: block;
+      color: var(--bb-muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .product-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .product-card {
+      display: grid;
+      grid-template-columns: 86px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid rgba(216, 79, 122, 0.12);
+      border-radius: 22px;
+      background: #fff;
+    }
+
+    .product-img {
+      height: 86px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.9), transparent 26%),
+        linear-gradient(145deg, #fff0f5, #f8c5d3 55%, #f2a2ba);
+      display: grid;
+      place-items: center;
+      color: var(--bb-rose-dark);
+      font-weight: 950;
+      font-size: 22px;
+      border: 1px solid #f2dfe6;
+    }
+
+    .product-meta strong {
+      display: block;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+    }
+
+    .product-meta small {
+      display: block;
+      color: var(--bb-muted);
+      margin: 3px 0 7px;
+      line-height: 1.45;
+    }
+
+    .product-meta .price {
+      color: var(--bb-rose-dark);
+      font-weight: 900;
+    }
+
+    .cart-box {
+      background: linear-gradient(145deg, #fff, #fff3f6);
+      border: 1px solid rgba(216, 79, 122, 0.16);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .cart-total {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 16px 0;
+      padding: 16px;
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--bb-line);
+    }
+
+    .cart-total strong {
+      font-size: 24px;
+      letter-spacing: -0.04em;
+      color: var(--bb-rose-dark);
+    }
+
+    .cart-items {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 54px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--bb-line);
+      border-radius: 18px;
+      padding: 10px;
+    }
+
+    .cart-thumb {
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #fff0f5, #f2a2ba);
+      display: grid;
+      place-items: center;
+      color: var(--bb-rose-dark);
+      font-weight: 950;
+    }
+
+    .remove-btn {
+      border: 0;
+      background: #fff1f1;
+      color: #a43a3a;
+      border-radius: 999px;
+      padding: 8px 10px;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 42px 18px;
+      color: var(--bb-muted);
+    }
+
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .form-card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(216, 79, 122, 0.13);
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      color: var(--bb-rose-dark);
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 7px;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      border: 1px solid var(--bb-line);
+      background: #fff;
+      border-radius: 16px;
+      padding: 13px 14px;
+      outline: none;
+      color: var(--bb-ink);
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 95px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 12px;
+    }
+
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid var(--bb-line);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .check-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #eff8ee;
+      color: var(--bb-green);
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      font-weight: 950;
+    }
+
+    .check-item strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .check-item span {
+      display: block;
+      color: var(--bb-muted);
+      font-size: 12px;
+      margin-top: 3px;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 80;
+      background: var(--bb-ink);
+      color: #fff;
+      padding: 13px 18px;
+      border-radius: 999px;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.2);
+      transition: all 0.25s ease;
+      font-weight: 850;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+    }
+
+    .mobile-nav {
+      display: none;
+      padding: 0 20px 14px;
+      max-width: var(--max);
+      margin: 0 auto;
+    }
+
+    .mobile-nav.open {
+      display: grid;
+      gap: 8px;
+    }
+
+    .disclaimer {
+      font-size: 12px;
+      color: var(--bb-muted);
+      line-height: 1.55;
+      border-top: 1px solid var(--bb-line);
+      padding-top: 14px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .detail-grid,
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sticky-panel {
+        position: static;
+      }
+
+      .look-grid,
+      .stat-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: inline-flex;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 24px 14px 70px;
+      }
+
+      .nav {
+        padding: 12px 14px;
+      }
+
+      .brand-text span {
+        display: none;
+      }
+
+      .icon-btn {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 20px;
+      }
+
+      .before-after-frame,
+      .detail-photo-card .before-after-frame {
+        min-height: 430px;
+      }
+
+      .look-grid,
+      .stat-row,
+      .trust-strip,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .product-card {
+        grid-template-columns: 72px 1fr;
+      }
+
+      .product-card .btn {
+        grid-column: 1 / -1;
+        width: 100%;
+      }
+
+      .cart-pill span:not(.cart-count) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <nav class="nav">
+        <button class="brand nav-trigger" data-page="home" aria-label="Go to home">
+          <span class="brand-mark">bb</span>
+          <span class="brand-text">
+            <strong>BeautyBarn</strong>
+            <span>Shop real K-beauty routines</span>
+          </span>
+        </button>
+
+        <div class="nav-links" aria-label="Primary navigation">
+          <button class="nav-link active nav-trigger" data-page="home">Shop a Look</button>
+          <button class="nav-link nav-trigger" data-page="detail">Featured Look</button>
+          <button class="nav-link nav-trigger" data-page="cart">Routine Cart</button>
+          <button class="nav-link nav-trigger" data-page="admin">Admin Preview</button>
+        </div>
+
+        <div class="nav-actions">
+          <button class="icon-btn" onclick="showToast('Search interaction: show looks by concern, product, or skin type')">⌕ Search</button>
+          <button class="cart-pill nav-trigger" data-page="cart">
+            🛍️ <span>Cart</span> <span class="cart-count" id="cartCount">0</span>
+          </button>
+          <button class="icon-btn mobile-menu-btn" id="mobileToggle">☰</button>
+        </div>
+      </nav>
+      <div class="mobile-nav" id="mobileNav">
+        <button class="nav-link active nav-trigger" data-page="home">Shop a Look</button>
+        <button class="nav-link nav-trigger" data-page="detail">Featured Look</button>
+        <button class="nav-link nav-trigger" data-page="cart">Routine Cart</button>
+        <button class="nav-link nav-trigger" data-page="admin">Admin Preview</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="page active" id="page-home">
+        <div class="container">
+          <div class="hero">
+            <div>
+              <span class="eyebrow">✨ New BeautyBarn concept</span>
+              <h1>Shop the <span class="gradient-text">real skin routine</span>, not just the product.</h1>
+              <p class="hero-copy">
+                Discover before-and-after skincare stories curated by concern, skin type, duration, and routine size. Add the complete K-beauty routine to cart in one tap.
+              </p>
+              <div class="hero-actions">
+                <button class="btn btn-primary" onclick="document.getElementById('looks').scrollIntoView()">Explore Looks</button>
+                <button class="btn btn-secondary nav-trigger" data-page="detail">View Featured Routine</button>
+              </div>
+              <div class="stat-row">
+                <div class="stat-card"><strong>24</strong><span>curated real-result looks</span></div>
+                <div class="stat-card"><strong>5</strong><span>average products per look</span></div>
+                <div class="stat-card"><strong>1-tap</strong><span>full routine add-to-cart</span></div>
+                <div class="stat-card"><strong>8</strong><span>skin concern filters</span></div>
+              </div>
+            </div>
+
+            <div class="hero-card">
+              <div class="result-badge">
+                <strong>Dullness to healthy glow</strong>
+                <span>5-product routine · Combination skin · 30 days</span>
+              </div>
+              <div class="before-after-frame">
+                <div class="skin-photo before"><span class="photo-label">Before</span></div>
+                <div class="skin-photo after"><span class="photo-label">After</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section-head" id="looks">
+            <div>
+              <div class="section-kicker">Real routines</div>
+              <h2 class="section-title">Shop by visible skin goal.</h2>
+              <p class="section-copy">Prototype interaction: click filters, open a look, add individual products, or add the full routine to cart.</p>
+            </div>
+            <button class="btn btn-soft nav-trigger" data-page="admin">+ Create look</button>
+          </div>
+
+          <div class="filters" aria-label="Look filters">
+            <button class="filter-chip active" data-filter="all">All looks</button>
+            <button class="filter-chip" data-filter="glow">Glow</button>
+            <button class="filter-chip" data-filter="acne">Acne</button>
+            <button class="filter-chip" data-filter="barrier">Barrier repair</button>
+            <button class="filter-chip" data-filter="pigmentation">Pigmentation</button>
+            <button class="filter-chip" data-filter="sensitive">Sensitive skin</button>
+            <button class="filter-chip" data-filter="beginner">Beginner routine</button>
+          </div>
+
+          <div class="look-grid" id="lookGrid">
+            <button class="look-card nav-trigger" data-page="detail" data-category="glow beginner">
+              <div class="look-visual">
+                <div class="skin-photo before"><span class="photo-label">Before</span></div>
+                <div class="skin-photo after"><span class="photo-label">After</span></div>
+              </div>
+              <div class="look-content">
+                <div class="tag-row"><span class="tag">Glow</span><span class="tag green">30 days</span></div>
+                <h3>Dull skin to healthy glass glow</h3>
+                <p>Hydration, brightening serum, barrier cream and daily sunscreen in one simple routine.</p>
+                <div class="price-line"><span>₹6,250 · 5 products</span><span class="mini-btn">View</span></div>
+              </div>
+            </button>
+
+            <button class="look-card nav-trigger" data-page="detail" data-category="acne sensitive">
+              <div class="look-visual">
+                <div class="skin-photo before"><span class="photo-label">Before</span></div>
+                <div class="skin-photo after"><span class="photo-label">After</span></div>
+              </div>
+              <div class="look-content">
+                <div class="tag-row"><span class="tag">Acne</span><span class="tag yellow">Sensitive</span></div>
+                <h3>Calm active acne without stripping skin</h3>
+                <p>Gentle cleanser, calming toner, spot care and non-heavy moisturiser for oily-sensitive skin.</p>
+                <div class="price-line"><span>₹5,480 · 4 products</span><span class="mini-btn">View</span></div>
+              </div>
+            </button>
+
+            <button class="look-card nav-trigger" data-page="detail" data-category="barrier sensitive">
+              <div class="look-visual">
+                <div class="skin-photo before"><span class="photo-label">Before</span></div>
+                <div class="skin-photo after"><span class="photo-label">After</span></div>
+              </div>
+              <div class="look-content">
+                <div class="tag-row"><span class="tag">Barrier</span><span class="tag green">21 days</span></div>
+                <h3>Damaged barrier to calm hydrated skin</h3>
+                <p>A low-irritation routine designed around ceramides, soothing ingredients, and repair.</p>
+                <div class="price-line"><span>₹4,790 · 4 products</span><span class="mini-btn">View</span></div>
+              </div>
+            </button>
+
+            <button class="look-card nav-trigger" data-page="detail" data-category="pigmentation glow">
+              <div class="look-visual">
+                <div class="skin-photo before"><span class="photo-label">Before</span></div>
+                <div class="skin-photo after"><span class="photo-label">After</span></div>
+              </div>
+              <div class="look-content">
+                <div class="tag-row"><span class="tag">Pigmentation</span><span class="tag green">45 days</span></div>
+                <h3>Dark spots to visibly even tone</h3>
+                <p>Brightening actives, sunscreen discipline and moisture support for uneven tone.</p>
+                <div class="price-line"><span>₹7,150 · 6 products</span><span class="mini-btn">View</span></div>
+              </div>
+            </button>
+
+            <button class="look-card nav-trigger" data-page="detail" data-category="beginner glow">
+              <div class="look-visual">
+                <div class="skin-photo before"><span class="photo-label">Before</span></div>
+                <div class="skin-photo after"><span class="photo-label">After</span></div>
+              </div>
+              <div class="look-content">
+                <div class="tag-row"><span class="tag">Beginner</span><span class="tag yellow">3 steps</span></div>
+                <h3>First Korean skincare routine</h3>
+                <p>A simple starter routine for first-time BeautyBarn customers who feel overwhelmed.</p>
+                <div class="price-line"><span>₹3,250 · 3 products</span><span class="mini-btn">View</span></div>
+              </div>
+            </button>
+
+            <button class="look-card nav-trigger" data-page="detail" data-category="sensitive barrier">
+              <div class="look-visual">
+                <div class="skin-photo before"><span class="photo-label">Before</span></div>
+                <div class="skin-photo after"><span class="photo-label">After</span></div>
+              </div>
+              <div class="look-content">
+                <div class="tag-row"><span class="tag">Redness</span><span class="tag green">28 days</span></div>
+                <h3>Redness to calmer-looking skin</h3>
+                <p>Soothing toner, calming serum and gentle moisturiser for reactive skin types.</p>
+                <div class="price-line"><span>₹5,020 · 4 products</span><span class="mini-btn">View</span></div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-detail">
+        <div class="container">
+          <button class="btn btn-secondary nav-trigger" data-page="home">← Back to all looks</button>
+
+          <div class="detail-grid" style="margin-top: 20px;">
+            <div class="sticky-panel">
+              <div class="detail-photo-card" id="detailPhotoCard">
+                <div class="result-badge">
+                  <strong>Before / After Proof</strong>
+                  <span>Tap products below to build this exact routine.</span>
+                </div>
+                <div class="before-after-frame">
+                  <div class="skin-photo before"><span class="photo-label">Before</span></div>
+                  <div class="skin-photo after"><span class="photo-label">After</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div class="panel-card">
+                <div class="tag-row" id="detailTagRow">
+                  <span class="tag">Glow</span>
+                  <span class="tag green">30 days</span>
+                  <span class="tag yellow">Combination skin</span>
+                </div>
+                <h1 class="detail-title">Dull skin to healthy glass glow</h1>
+                <p class="section-copy" id="detailStory">
+                  Ananya wanted a simple K-beauty routine for dullness, dry patches and uneven texture. This look uses hydration, gentle brightening and daily sunscreen protection.
+                </p>
+
+                <div class="trust-strip" id="detailTrustStrip">
+                  <div class="trust-item"><strong>5</strong><span>products used</span></div>
+                  <div class="trust-item"><strong>AM + PM</strong><span>routine order</span></div>
+                  <div class="trust-item"><strong>₹6,250</strong><span>full routine value</span></div>
+                </div>
+
+                <div class="cart-box">
+                  <div class="cart-total">
+                    <div>
+                      <strong>Shop full look</strong><br />
+                      <span id="detailCartSummary" style="color: var(--bb-muted);">Cleanser + toner + serum + cream + sunscreen</span>
+                    </div>
+                    <strong id="detailCartPrice">₹6,250</strong>
+                  </div>
+                  <div style="display:flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-primary" onclick="addRoutine()">Add Full Routine to Cart</button>
+                    <button class="btn btn-secondary" onclick="addStarterRoutine()">Add 2-Step Starter</button>
+                    <button class="btn btn-soft" onclick="showToast('Look saved to wishlist')">♡ Save Look</button>
+                  </div>
+                </div>
+
+                <p class="disclaimer">Visible results are shared for inspiration and education. Individual results may vary based on skin type, usage consistency, lifestyle, and existing skin condition.</p>
+              </div>
+
+              <div class="panel-card">
+                <div class="section-kicker">Routine order</div>
+                <h2 class="section-title" style="font-size: 32px;">How to use this look</h2>
+                <div class="routine-tabs">
+                  <button class="routine-tab active" data-routine="morning">Morning</button>
+                  <button class="routine-tab" data-routine="night">Night</button>
+                </div>
+                <div class="routine-list" id="routineList"></div>
+              </div>
+
+              <div class="panel-card">
+                <div class="section-kicker">Products used</div>
+                <h2 class="section-title" style="font-size: 32px;">Buy the exact routine</h2>
+                <p class="section-copy">Each product card explains why it belongs in this transformation.</p>
+                <div class="product-list" id="productList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-cart">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Routine cart</div>
+              <h2 class="section-title">Your Shop a Look cart.</h2>
+              <p class="section-copy">Prototype behaviour: products added from a look appear here as a grouped routine cart.</p>
+            </div>
+            <button class="btn btn-secondary nav-trigger" data-page="home">Continue shopping</button>
+          </div>
+
+          <div class="detail-grid">
+            <div class="panel-card">
+              <div id="cartItems" class="cart-items"></div>
+            </div>
+
+            <div class="panel-card sticky-panel">
+              <div class="section-kicker">Checkout summary</div>
+              <h2 class="section-title" style="font-size: 34px;">Dull skin to glow routine</h2>
+              <div class="cart-total">
+                <span>Subtotal</span>
+                <strong id="cartSubtotal">₹0</strong>
+              </div>
+              <div class="cart-total">
+                <span>Routine savings</span>
+                <strong style="color: var(--bb-green);">₹350</strong>
+              </div>
+              <button class="btn btn-primary" style="width: 100%;" onclick="showToast('Checkout prototype: send user to payment flow')">Proceed to Checkout</button>
+              <button class="btn btn-secondary" style="width: 100%; margin-top: 10px;" onclick="clearCart()">Clear cart</button>
+              <p class="disclaimer">Later version: allow replacement for out-of-stock products and show “complete the look” suggestions in cart.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="page-admin">
+        <div class="container">
+          <button class="btn btn-secondary nav-trigger" data-page="home">← Back to customer view</button>
+          <div class="section-head">
+            <div>
+              <div class="section-kicker">Admin MVP</div>
+              <h2 class="section-title">Create and publish a Shop a Look story.</h2>
+              <p class="section-copy">This is a prototype of the internal BeautyBarn workflow for uploading before/after looks, mapping products, and tracking consent.</p>
+            </div>
+          </div>
+
+          <div class="admin-layout">
+            <div class="form-card">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Look title</label>
+                  <input value="Dull skin to healthy glass glow" />
+                </div>
+                <div class="two-col">
+                  <div class="field">
+                    <label>Skin concern</label>
+                    <select><option>Dullness</option><option>Acne</option><option>Pigmentation</option><option>Barrier repair</option></select>
+                  </div>
+                  <div class="field">
+                    <label>Skin type</label>
+                    <select><option>Combination</option><option>Oily</option><option>Dry</option><option>Sensitive</option></select>
+                  </div>
+                </div>
+                <div class="two-col">
+                  <div class="field">
+                    <label>Before image</label>
+                    <input value="before-ananya-30-days.jpg" />
+                  </div>
+                  <div class="field">
+                    <label>After image</label>
+                    <input value="after-ananya-30-days.jpg" />
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Story</label>
+                  <textarea>Ananya wanted a simple Korean skincare routine to improve dullness, dry patches, and uneven texture.</textarea>
+                </div>
+                <div class="field">
+                  <label>Mapped products</label>
+                  <textarea>1. Low pH Cleanser\n2. Hydrating Toner\n3. Glow Serum\n4. Barrier Repair Cream\n5. Lightweight Sunscreen</textarea>
+                </div>
+                <button class="btn btn-primary" onclick="showToast('Look saved as draft')">Save Draft</button>
+                <button class="btn btn-secondary" onclick="showToast('Look submitted for approval')">Submit for Approval</button>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <div class="section-kicker">Publishing checklist</div>
+              <h2 class="section-title" style="font-size: 34px;">Ready to publish?</h2>
+              <div class="checklist" style="margin-top: 18px;">
+                <div class="check-item"><span class="check-dot">✓</span><div><strong>Consent captured</strong><span>Customer has approved usage of before/after images for BeautyBarn commerce pages.</span></div></div>
+                <div class="check-item"><span class="check-dot">✓</span><div><strong>Products mapped</strong><span>Every product in the routine is linked to live product inventory and pricing.</span></div></div>
+                <div class="check-item"><span class="check-dot">✓</span><div><strong>Claim language reviewed</strong><span>No medical claims. Uses safe language such as “helps improve appearance of”.</span></div></div>
+                <div class="check-item"><span class="check-dot">✓</span><div><strong>Mobile view approved</strong><span>Before/after visual, product list, and add-to-cart CTA work on mobile.</span></div></div>
+                <div class="check-item"><span class="check-dot">✓</span><div><strong>Analytics attached</strong><span>Tracks look views, product adds, routine adds, checkout starts, and purchases.</span></div></div>
+              </div>
+              <div style="display:flex; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
+                <button class="btn btn-dark" onclick="showToast('Look published to Shop a Look')">Publish Look</button>
+                <button class="btn btn-soft nav-trigger" data-page="detail">Preview Customer Page</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">Added to cart</div>
+
+  <script>
+    const products = [
+      { id: 'cleanser', code: 'C', name: 'Low pH Gentle Cleanser', use: 'Removes sunscreen and impurities without stripping the skin barrier.', price: 950, step: 'Cleanse' },
+      { id: 'toner', code: 'T', name: 'Hydrating Essence Toner', use: 'Adds water-based hydration and helps prep skin for the serum step.', price: 1280, step: 'Hydrate' },
+      { id: 'serum', code: 'S', name: 'Glow Brightening Serum', use: 'Supports brighter-looking skin and improves the appearance of uneven tone.', price: 1450, step: 'Treat' },
+      { id: 'cream', code: 'M', name: 'Barrier Repair Cream', use: 'Locks hydration and supports skin comfort through the routine.', price: 1370, step: 'Moisturise' },
+      { id: 'sunscreen', code: 'SPF', name: 'Lightweight Daily Sunscreen', use: 'Protects the routine result and helps prevent future dullness from sun exposure.', price: 1200, step: 'Protect' }
+    ];
+
+    const morningSteps = [
+      ['Cleanse', 'Low pH Gentle Cleanser', 'Start with a clean base.'],
+      ['Hydrate', 'Hydrating Essence Toner', 'Layer hydration before treatment.'],
+      ['Treat', 'Glow Brightening Serum', 'Apply 2–3 drops before moisturiser.'],
+      ['Protect', 'Lightweight Daily Sunscreen', 'Final morning step. Reapply if outdoors.']
+    ];
+
+    const nightSteps = [
+      ['Cleanse', 'Low pH Gentle Cleanser', 'Remove sunscreen and daily buildup.'],
+      ['Hydrate', 'Hydrating Essence Toner', 'Apply after cleansing.'],
+      ['Treat', 'Glow Brightening Serum', 'Use consistently for visible improvement.'],
+      ['Seal', 'Barrier Repair Cream', 'Lock in hydration overnight.']
+    ];
+
+    const lookImageMap = {
+      'glow beginner': 'Dullness to healthy glow.jpg',
+      'acne sensitive': 'Calm active acne without stripping skin.jpg',
+      'barrier sensitive': 'Damaged barrier to calm hydrated skin.png',
+      'pigmentation glow': 'Dark spots to visibly even tone.jpg',
+      'beginner glow': 'First Korean skincare routine.png',
+      'sensitive barrier': 'can you change and place the image others not change.jpg'
+    };
+
+    let cart = [];
+    let currentLookKey = 'glow beginner';
+
+    const pages = document.querySelectorAll('.page');
+    const navTriggers = document.querySelectorAll('.nav-trigger');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const mobileNav = document.getElementById('mobileNav');
+    const detailPhotoCard = document.getElementById('detailPhotoCard');
+    const detailTagRow = document.getElementById('detailTagRow');
+    const detailTitle = document.querySelector('.detail-title');
+    const detailStory = document.getElementById('detailStory');
+    const detailTrustStrip = document.getElementById('detailTrustStrip');
+    const detailCartSummary = document.getElementById('detailCartSummary');
+    const detailCartPrice = document.getElementById('detailCartPrice');
+    const filterChips = document.querySelectorAll('.filter-chip');
+    const lookCards = document.querySelectorAll('.look-card');
+
+    function setActiveLook(lookKey, clickedCard = null) {
+      const card = clickedCard || Array.from(lookCards).find(item => item.dataset.category === lookKey);
+      if (!card) return;
+
+      currentLookKey = lookKey;
+
+      const image = lookImageMap[lookKey] || lookImageMap['glow beginner'];
+      const title = card.querySelector('h3').textContent.trim();
+      const description = card.querySelector('p').textContent.trim();
+      const tagsHtml = card.querySelector('.tag-row').innerHTML;
+      const priceMeta = card.querySelector('.price-line span').textContent.trim();
+      const [price = '₹0', productCount = '0 products'] = priceMeta.split('·').map(part => part.trim());
+
+      detailPhotoCard.style.setProperty('--featured-look-image', `url("${image}")`);
+      detailTagRow.innerHTML = tagsHtml;
+      detailTitle.textContent = title;
+      detailStory.textContent = description;
+      detailTrustStrip.innerHTML = `
+        <div class="trust-item"><strong>${productCount.replace(' products', '').replace(' product', '')}</strong><span>products used</span></div>
+        <div class="trust-item"><strong>AM + PM</strong><span>routine order</span></div>
+        <div class="trust-item"><strong>${price}</strong><span>full routine value</span></div>
+      `;
+      detailCartSummary.textContent = description;
+      detailCartPrice.textContent = price;
+    }
+
+    navTriggers.forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const page = trigger.dataset.page;
+        if (!page) return;
+
+         if (page === 'detail') {
+          const selectedLookKey = trigger.classList.contains('look-card') ? trigger.dataset.category : currentLookKey;
+          setActiveLook(selectedLookKey, trigger.classList.contains('look-card') ? trigger : null);
+        }
+
+        showPage(page);
+      });
+    });
+
+    function showPage(page) {
+      pages.forEach(section => section.classList.remove('active'));
+      document.getElementById(`page-${page}`).classList.add('active');
+      navLinks.forEach(link => link.classList.toggle('active', link.dataset.page === page));
+      mobileNav.classList.remove('open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (page === 'cart') renderCart();
+    }
+
+    document.getElementById('mobileToggle').addEventListener('click', () => {
+      mobileNav.classList.toggle('open');
+    });
+
+    filterChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        filterChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const filter = chip.dataset.filter;
+        lookCards.forEach(card => {
+          const categories = card.dataset.category || '';
+          card.style.display = filter === 'all' || categories.includes(filter) ? 'block' : 'none';
+        });
+        showToast(filter === 'all' ? 'Showing all looks' : `Filtered by ${chip.textContent}`);
+      });
+    });
+
+    function renderProducts() {
+      const productList = document.getElementById('productList');
+      productList.innerHTML = products.map(product => `
+        <div class="product-card">
+          <div class="product-img">${product.code}</div>
+          <div class="product-meta">
+            <strong>${product.name}</strong>
+            <small>${product.use}</small>
+            <span class="price">₹${product.price.toLocaleString('en-IN')}</span>
+          </div>
+          <button class="btn btn-secondary" onclick="addProduct('${product.id}')">Add</button>
+        </div>
+      `).join('');
+    }
+
+    function renderRoutine(type = 'morning') {
+      const list = type === 'morning' ? morningSteps : nightSteps;
+      const routineList = document.getElementById('routineList');
+      routineList.innerHTML = list.map((step, index) => `
+        <div class="routine-step">
+          <div class="step-no">${index + 1}</div>
+          <div class="step-copy">
+            <strong>${step[0]} · ${step[1]}</strong>
+            <span>${step[2]}</span>
+          </div>
+          <span class="tag">${type === 'morning' ? 'AM' : 'PM'}</span>
+        </div>
+      `).join('');
+    }
+
+    document.querySelectorAll('.routine-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.routine-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        renderRoutine(tab.dataset.routine);
+      });
+    });
+
+    function addProduct(id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+      cart.push(product);
+      updateCartCount();
+      showToast(`${product.name} added to cart`);
+    }
+
+    function addRoutine() {
+      cart = [...cart, ...products];
+      updateCartCount();
+      showToast('Full routine added to cart');
+    }
+
+    function addStarterRoutine() {
+      cart = [...cart, products[2], products[4]];
+      updateCartCount();
+      showToast('Starter routine added to cart');
+    }
+
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      updateCartCount();
+      renderCart();
+      showToast('Product removed');
+    }
+
+    function clearCart() {
+      cart = [];
+      updateCartCount();
+      renderCart();
+      showToast('Cart cleared');
+    }
+
+    function updateCartCount() {
+      document.getElementById('cartCount').textContent = cart.length;
+    }
+
+    function renderCart() {
+      const cartItems = document.getElementById('cartItems');
+      const subtotal = cart.reduce((sum, item) => sum + item.price, 0);
+      document.getElementById('cartSubtotal').textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+
+      if (!cart.length) {
+        cartItems.innerHTML = `
+          <div class="empty-cart">
+            <h2>Your routine cart is empty.</h2>
+            <p>Explore Shop a Look and add a full routine or starter stack.</p>
+            <button class="btn btn-primary nav-trigger-inline" onclick="showPage('home')">Explore Looks</button>
+          </div>
+        `;
+        return;
+      }
+
+      cartItems.innerHTML = cart.map((item, index) => `
+        <div class="cart-item">
+          <div class="cart-thumb">${item.code}</div>
+          <div>
+            <strong>${item.name}</strong><br />
+            <span style="color: var(--bb-muted); font-size: 13px;">${item.step} step · from Shop a Look</span>
+          </div>
+          <div style="text-align:right;">
+            <strong>₹${item.price.toLocaleString('en-IN')}</strong><br />
+            <button class="remove-btn" onclick="removeCartItem(${index})">Remove</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1800);
+    }
+
+    setActiveLook(currentLookKey);
+    renderProducts();
+    renderRoutine('morning');
+    renderCart();
+  </script>
+</body>
+</html>
